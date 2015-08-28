@@ -51,9 +51,23 @@ public class MP1 {
 
     public String[] process() throws Exception {
         String[] ret = new String[20];
-       
-        //TODO
 
+        String[] ret = new String[20];
+        try (BufferedReader br = new BufferedReader(
+            new FileReader(this.inputFileName))
+        ) {
+          StringBuilder sb = new StringBuilder();
+          String line = br.readLine();
+
+          while (line != null) {
+            sb.append(line);
+            sb.append(',');
+            line = br.readLine();
+          }
+
+          // TODO: change this to use strings, process/sort out things as they come
+          String titles = sb.toString();
+        }
         return ret;
     }
 
