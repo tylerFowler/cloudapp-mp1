@@ -133,6 +133,11 @@ class FreqComp implements Comparator<String> {
 
     @Override
     public int compare(String _this, String _that) {
-        return (sourceMap.get(_this) > sourceMap.get(_that)) ? 1 : -1;
+        // if we have the same values then fall back to comparing by key
+        int _thisValue = sourceMap.get(_this);
+        int _thatValue = sourceMap.get(_that);
+
+        if (_thisValue == _thatValue) return _this.compareTo(_that) * -1;
+        return (_thisValue > _thatValue) ? 1 : -1;
     }
 }
