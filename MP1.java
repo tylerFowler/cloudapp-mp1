@@ -1,14 +1,17 @@
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.lang.Override;
 import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.StringTokenizer;
 
 public class MP1 {
     Random generator;
     String userName;
     String inputFileName;
-    String delimiters = " \t,;.?!-:@[](){}_*/";
+    String delimiters = " \t,;.?!-:@\\[\\]\\(\\)\\{}_*/";
     String[] stopWordsArray = {"i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours",
             "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its",
             "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
@@ -52,21 +55,54 @@ public class MP1 {
     public String[] process() throws Exception {
         String[] ret = new String[20];
 
-        String[] ret = new String[20];
         try (BufferedReader br = new BufferedReader(
             new FileReader(this.inputFileName))
         ) {
-          StringBuilder sb = new StringBuilder();
-          String line = br.readLine();
+            HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
 
-          while (line != null) {
-            sb.append(line);
-            sb.append(',');
-            line = br.readLine();
-          }
+            List<Integer> indexes = Arrays.asList(getIndexes());
+            String line = br.readLine();
 
-          // TODO: change this to use strings, process/sort out things as they come
-          String titles = sb.toString();
+            int idx = 0;
+            while (line != null) {
+                if (!indexes.contains(idx)) {
+                    line = br.readLine();
+                    idx++;
+                    continue;
+                }
+
+                StringTokenizer st = new StringTokenizer(line, delimiters);
+
+                while (st.hasMoreTokens()) {
+                    String cleanWord = st.nextToken().trim().toLowerCase();
+
+                    // ignore blacklisted "filler" words
+                    if (Arrays.asList(stopWordsArray).contains(cleanWord)) continue;
+
+                    // if not in the list, then add it, otherwise just bump the word count
+                    if (wordMap.containsKey(cleanWord))
+                        wordMap.put(cleanWord, wordMap.get(cleanWord) + 1);
+                    else
+                        wordMap.put(cleanWord, 1);
+                }
+
+                line = br.readLine();
+                idx++;
+            }
+
+            int i = 0;
+
+            // TreeMap sorts by Key so we need a custom comparator that has the context of the source map
+            FreqComp comp = new FreqComp(wordMap);
+            TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(comp);
+            sortedMap.putAll(wordMap);
+
+            for (Map.Entry entry : sortedMap.descendingMap().entrySet()) {
+                if (i >= ret.length) break;
+
+                ret[i] = (String)entry.getKey();
+                i++;
+            }
         }
         return ret;
     }
@@ -84,5 +120,19 @@ public class MP1 {
                 System.out.println(item);
             }
         }
+    }
+}
+
+
+class FreqComp implements Comparator<String> {
+    Map<String, Integer> sourceMap;
+
+    FreqComp(Map<String, Integer> sourceMap) {
+        this.sourceMap = sourceMap;
+    }
+
+    @Override
+    public int compare(String _this, String _that) {
+        return (sourceMap.get(_this) > sourceMap.get(_that)) ? 1 : -1;
     }
 }
