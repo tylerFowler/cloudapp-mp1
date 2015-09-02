@@ -58,20 +58,18 @@ public class MP1 {
         try (BufferedReader br = new BufferedReader(
             new FileReader(this.inputFileName))
         ) {
+            String line = null;
             HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
-
             List<Integer> indexes = Arrays.asList(getIndexes());
-            String line = br.readLine();
 
-            int idx = 0;
-            while (line != null) {
-                if (!indexes.contains(idx)) {
-                    line = br.readLine();
-                    idx++;
-                    continue;
-                }
+            ArrayList<String> file = new ArrayList<String>();
 
-                StringTokenizer st = new StringTokenizer(line, delimiters);
+            while ((line = br.readLine()) != null) {
+                file.add(line);
+            }
+
+            for (int idx : Arrays.asList(getIndexes())) {
+                StringTokenizer st = new StringTokenizer(file.get(idx), delimiters);
 
                 while (st.hasMoreTokens()) {
                     String cleanWord = st.nextToken().trim().toLowerCase();
@@ -83,23 +81,21 @@ public class MP1 {
                     if (wordMap.containsKey(cleanWord))
                         wordMap.put(cleanWord, wordMap.get(cleanWord) + 1);
                     else
-                        wordMap.put(cleanWord, 1);
+                        wordMap.put(cleanWord, 0);
                 }
-
-                line = br.readLine();
-                idx++;
             }
-
-            int i = 0;
 
             // TreeMap sorts by Key so we need a custom comparator that has the context of the source map
             FreqComp comp = new FreqComp(wordMap);
             TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(comp);
             sortedMap.putAll(wordMap);
 
+            int i = 0;
+            System.out.println("Found " + sortedMap.size() + " keys");
             for (Map.Entry entry : sortedMap.descendingMap().entrySet()) {
                 if (i >= ret.length) break;
 
+                System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
                 ret[i] = (String)entry.getKey();
                 i++;
             }
@@ -138,6 +134,6 @@ class FreqComp implements Comparator<String> {
         int _thatValue = sourceMap.get(_that);
 
         if (_thisValue == _thatValue) return _this.compareTo(_that) * -1;
-        return (_thisValue > _thatValue) ? 1 : -1;
+        return (_thisValue >= _thatValue) ? 1 : -1;
     }
 }
