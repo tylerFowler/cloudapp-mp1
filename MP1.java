@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 public class MP1 {
     Random generator;
@@ -58,18 +59,20 @@ public class MP1 {
         try (BufferedReader br = new BufferedReader(
             new FileReader(this.inputFileName))
         ) {
-            String line = null;
             HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
+
             List<Integer> indexes = Arrays.asList(getIndexes());
+            String line = br.readLine();
 
-            ArrayList<String> file = new ArrayList<String>();
+            int idx = 0;
+            while (line != null) {
+                if (!indexes.contains(idx)) {
+                    line = br.readLine();
+                    idx++;
+                    continue;
+                }
 
-            while ((line = br.readLine()) != null) {
-                file.add(line);
-            }
-
-            for (int idx : Arrays.asList(getIndexes())) {
-                StringTokenizer st = new StringTokenizer(file.get(idx), delimiters);
+                StringTokenizer st = new StringTokenizer(line, delimiters);
 
                 while (st.hasMoreTokens()) {
                     String cleanWord = st.nextToken().trim().toLowerCase();
@@ -81,8 +84,11 @@ public class MP1 {
                     if (wordMap.containsKey(cleanWord))
                         wordMap.put(cleanWord, wordMap.get(cleanWord) + 1);
                     else
-                        wordMap.put(cleanWord, 0);
+                        wordMap.put(cleanWord, 1);
                 }
+
+                line = br.readLine();
+                idx++;
             }
 
             // TreeMap sorts by Key so we need a custom comparator that has the context of the source map
@@ -91,7 +97,6 @@ public class MP1 {
             sortedMap.putAll(wordMap);
 
             int i = 0;
-            System.out.println("Found " + sortedMap.size() + " keys");
             for (Map.Entry entry : sortedMap.descendingMap().entrySet()) {
                 if (i >= ret.length) break;
 
@@ -101,6 +106,21 @@ public class MP1 {
             }
         }
         return ret;
+
+        // Playground
+        TreeSet<HashMap<Integer, Integer>> ts = new TreeSet<Hashmap<Integer, Integer>>();
+        Integer max = ts.descendingSet().first();
+        ArrayList<Intger> xs = new ArrayList<Integer>();
+
+        Map<Integer, ArrayList<Integer>> xt = new HashMap<Integer, ArrayList<Integer>>();
+
+
+        Set<Integer> pages = xt.keySet();
+        String t = "";
+        ts.subset(ts.first(), ts.last());
+        SortedSet<Integer> xy = new SortedSet<Integer>();
+        ts.descendingSet();
+        Integer a = 0;
     }
 
     public static void main(String[] args) throws Exception {
